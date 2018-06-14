@@ -52,12 +52,23 @@ type GitRef struct {
 }
 
 func handle_webhook(body []byte) {
-	fmt.Printf("%s\n", string(body))
-
 	var issues_event IssuesEvent
 	err := json.Unmarshal(body, &issues_event)
 	if err != nil {
 		log.Print("error:", err)
+		return
 	}
-	fmt.Printf("%+v\n", issues_event)
+	if issues_event.Action == "" {
+		log.Print("Noop: Recieved event without an action to act on.")
+		return
+	}
+	log.Print("Action: Handling", issues_event.Action)
+	switch action := issues_event.Action; action {
+	case "labeled":
+		fmt.Printf("labeled\n")
+	case "unlabeled":
+		fmt.Printf("unlabeled\n")
+	default:
+		fmt.Printf("%s\n", action)
+	}
 }
