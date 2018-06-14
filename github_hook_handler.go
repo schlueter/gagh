@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -26,6 +26,38 @@ func githubHookHandler() http.Handler {
 			log.Fatal(err)
 			return
 		}
-		fmt.Fprintf(writer, "URL.Path: %s\nBody: %s", request.URL.Path, string(body))
+		handle_webhook(body)
 	})
+}
+
+type IssuesEvent struct {
+	Action       string
+	Number       int
+	Repository   Repository
+	Pull_request PullRequest
+}
+
+type Repository struct {
+	Name      string
+	Full_name string
+}
+
+type PullRequest struct {
+	Html_url string
+	Head     GitRef
+}
+
+type GitRef struct {
+	Label string
+}
+
+func handle_webhook(body []byte) {
+	fmt.Printf("%s\n", string(body))
+
+	var issues_event IssuesEvent
+	err := json.Unmarshal(body, &issues_event)
+	if err != nil {
+		log.Print("error:", err)
+	}
+	fmt.Printf("%+v\n", issues_event)
 }
