@@ -60,11 +60,19 @@ type GitRef struct {
 	Label string `json:"label"`
 }
 
+func handle_labeled(pull_request_event PullRequestEvent) {
+	fmt.Printf("Labeled PR #%s %s in %s\n", strconv.Itoa(pull_request_event.Number), pull_request_event.Label, pull_request_event.Repository.Name)
+}
+
+func handle_unlabeled(pull_request_event PullRequestEvent) {
+	fmt.Printf("Unlabeled PR #%s %s in %s\n", strconv.Itoa(pull_request_event.Number), pull_request_event.Label, pull_request_event.Repository.Name)
+}
+
 func handle_webhook(body []byte) {
 	var pull_request_event PullRequestEvent
 	err := json.Unmarshal(body, &pull_request_event)
 	if err != nil {
-		log.Print("error:", err)
+		log.Print("error parsing webhook payload:", err)
 		return
 	}
 	if pull_request_event.Action == "" {
@@ -72,12 +80,11 @@ func handle_webhook(body []byte) {
 		return
 	}
 	log.Print("Action: Handling %s", pull_request_event.Action)
-	var pull_request_number = strconv.Itoa(pull_request_event.Number)
 	switch action := pull_request_event.Action; action {
 	case "labeled":
-		fmt.Printf("Labeled PR #%s %s in %s\n", pull_request_number, pull_request_event.Label, pull_request_event.Repository.Name)
+		handle_labeled(pull_request_event)
 	case "unlabeled":
-		fmt.Printf("Unlabeled PR #%s %s in %s\n", pull_request_number, pull_request_event.Label, pull_request_event.Repository.Name)
+		handle_unlabeled(pull_request_event)
 	default:
 		fmt.Printf("Unknown action %s\n", action)
 	}
