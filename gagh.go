@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/schlueter/github_hook_handler/internal/config"
+	"github.com/schlueter/gagh/internal/config"
 )
 
 const port = ":9999"
