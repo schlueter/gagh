@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,7 +11,9 @@ import (
 	"github.com/schlueter/gagh/internal/config"
 )
 
-const port = ":9999"
+const (
+	default_port = "9999"
+)
 
 type gitHubEvent struct {
 	Repository struct {
@@ -35,7 +36,7 @@ type pullRequestEvent struct {
 	} `json:"pull_request"`
 }
 
-func githubHookHandler() http.Handler {
+func github_hook_handler() http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		if request.URL.Path != "/" {
 			http.Error(writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -86,9 +87,10 @@ func main() {
 		log.Fatal(err)
 		os.Exit(2)
 	}
-	fmt.Printf("%s\n", conf.GitHubToken)
-	router := http.NewServeMux()
-	router.Handle("/", githubHookHandler())
-	err = http.ListenAndServe(port, githubHookHandler())
+	port := conf.Port
+	if port == "" {
+		port = default_port
+	}
+	err = http.ListenAndServe(":"+port, github_hook_handler())
 	log.Fatal(err)
 }

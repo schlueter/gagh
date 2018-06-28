@@ -14,7 +14,8 @@ type RequestParameters struct {
 }
 
 type GaghConfig struct {
-	GitHubToken string `yaml:"github_token"`
+	Port             string            `yaml:"port"`
+	ConfigParameters map[string]string `yaml:"config_parameters"`
 
 	WebhookConfigs []struct {
 		RequestParameters
@@ -22,7 +23,9 @@ type GaghConfig struct {
 		Url  string `yaml:"url"`
 	} `yaml:"webhook_configs"`
 
+	// TODO don't handle each type of request independently
 	GitHubPullRequestHandlers []struct {
+		// TODO allow response based on more generic criteria than just the action
 		Action string `yaml:"action"`
 
 		Functions []struct {
